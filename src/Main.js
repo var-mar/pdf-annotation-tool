@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+
+import MyLocalize from './modules/Localize';
+
 // import routes from './routes.js';
 
 import {
@@ -13,7 +16,6 @@ import {
 } from 'react-router-dom'
 
 import Base from './components/Base.jsx';
-import HomePage from './components/HomePage.jsx';
 import LoginPage from './containers/LoginPage.jsx';
 import LogoutFunction from './containers/LogoutFunction.jsx';
 import SignUpPage from './containers/SignUpPage.jsx';
@@ -29,6 +31,8 @@ let ws = initws();
 
 // remove tap delay, essential for MaterialUI to work properly
 injectTapEventPlugin();
+
+console.log('version:1.2');
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={props => (
@@ -94,23 +98,22 @@ class Main extends Component {
               </div>
               {this.state.authenticated ? (
                 <div className="top-bar-right">
-                  <Link to="/dashboard">Dashboard</Link>
-                  <Link to="/pdf">Annotate PDF</Link>
-                  <Link to="/about">About</Link>
-                  <Link to="/logout">Log out</Link>
+                  <Link to="/dashboard">{MyLocalize.translate('Dashboard')}</Link>
+                  <Link to="/pdf">{MyLocalize.translate('Annotate PDF')}</Link>
+                  <Link to="/about">{MyLocalize.translate('About')}</Link>
+                  <Link to="/logout">{MyLocalize.translate('Log out')}</Link>
                 </div>
               ) : (
                 <div className="top-bar-right">
-                  <Link to="/login">Log in</Link>
-                  <Link to="/signup">Sign up</Link>
-                  <Link to="/about">About</Link>
+                  <Link to="/login">{MyLocalize.translate('Log in')}</Link>
+                  <Link to="/signup">{MyLocalize.translate('Sign up')}</Link>
+                  <Link to="/about">{MyLocalize.translate('About')}</Link>
                 </div>
               )}
 
             </div>
 
-            <PropsRoute exact path="/" component={HomePage} toggleAuthenticateStatus={() => this.toggleAuthenticateStatus()} />
-            <PrivateRoute path="/dashboard" component={DashboardPage}/>
+            <PropsRoute exact path="/" component={DashboardPage} toggleAuthenticateStatus={() => this.toggleAuthenticateStatus()} />
             <PrivateRoute path="/pdf" component={PdfPage}/>
             <LoggedOutRoute path="/login" component={LoginPage} toggleAuthenticateStatus={() => this.toggleAuthenticateStatus()} />
             <LoggedOutRoute path="/signup" component={SignUpPage}/>

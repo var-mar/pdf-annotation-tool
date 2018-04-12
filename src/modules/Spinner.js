@@ -1,6 +1,7 @@
 // @flow
 
 import React from "react";
+import MyLocalize from '../modules/Localize';
 
 import "../style/Spinner.css";
 

@@ -47,6 +47,29 @@ body {
   background: rgba(58, 56, 52, 0.08);
 }
 
+.pdf__item{
+  list-style: "none";
+  padding: 0;
+  background: rgba(148, 46, 42, 0.08);
+}
+
+.pdf__item:hover {
+  background: rgba(48, 46, 42, 0.08);
+}
+
+.pdfbar {
+  overflow: auto;
+  color: rgb(119, 119, 119);
+}
+
+.pdfbar a{
+    text-decoration:none;
+}
+
+.pdfbar a:hover{
+  text-decoration:underline; 
+}
+
 a {
   color: #d35400;
 }
@@ -56,9 +79,19 @@ blockquote {
   margin: 0;
   quotes: "\201c" "\201d";
 }
+
 blockquote:before {
   content: open-quote;
 }
+
 blockquote:after {
   content: close-quote;
+}
+
+.formText{
+  font-size: 10px;
+}
+.formWarnings{
+  font-size: 10px;
+  color: #d35400;
 }

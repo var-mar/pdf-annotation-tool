@@ -1,6 +1,10 @@
 // @flow
 
 import React from "react";
+import Select from 'react-select';
+import 'react-select/dist/react-select.css';
+
+import MyLocalize from '../modules/Localize';
 
 import type { T_Highlight } from "../../src/types";
 type T_ManuscriptHighlight = T_Highlight;
@@ -8,25 +12,40 @@ type T_ManuscriptHighlight = T_Highlight;
 type Props = {
   highlights: Array<T_ManuscriptHighlight>,
   resetHighlights: () => void,
-  loadNewPDF: () => void,
-  deleteHighlights:()=>void //e: event
+  handleChange: ()=> void,
+  deleteHighlights:()=>void, //e: event
+  state: Object
 };
 
 const updateHash = highlight => {
   window.location.hash = `highlight-${highlight.id}`;
 };
 
-function Sidebar({ highlights, resetHighlights, loadNewPDF,deleteHighlights}: Props) {
+function Sidebar({ highlights, resetHighlights, deleteHighlights, handleChange, state}: Props) {
+
+  const { selectedOption } = state;
+  const value = selectedOption && selectedOption.value;
+
   return (
       <div className="sidebar" style={{ width: "25vw" }}>
 
       <div className="description" style={{ padding: "1rem" }}>
         <p>
           <small>
-            To create area highlight hold ⌥ Option key (Alt), then click and
-            drag.
+            MyLocalize.translate('To create area highlight hold ⌥ Option key (Alt), then click and drag.')
           </small>
         </p>
+
+        <Select
+        name="form-filter-annotations"
+        value={value}
+        onChange={handleChange}
+        options={[
+          { value: 'yours', label: MyLocalize.translate('See only yours annotations') },
+          { value: 'all', label: MyLocalize.translate('See all annotations') },
+        ]}
+        />
+
       </div>
 
       <ul className="sidebar__highlights">

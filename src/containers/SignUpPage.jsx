@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import SignUpForm from '../components/SignUpForm.jsx';
+import MyLocalize from '../modules/Localize';
 
 class SignUpPage extends React.Component {
 

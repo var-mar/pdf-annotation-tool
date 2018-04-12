@@ -1,6 +1,7 @@
 import React from 'react';
 import Auth from '../modules/Auth';
 import { getws } from './../WebSocket'
+import MyLocalize from '../modules/Localize';
 
 class AboutPage extends React.Component {
 

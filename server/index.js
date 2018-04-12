@@ -10,11 +10,19 @@ const app = express();
 var server = require('http').createServer(app);
 // Tell the app to look for static files in these directories
 app.use(express.static('./build/'));
-//app.use(express.static('../client/dist/'));
-//app.use(express.static('../client/pdf/'));
+app.use(express.static('./pdfUpload/'));
 
 // Tell the app to parse HTTP body messages
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+    limit: '50mb',
+    parameterLimit: 100000,
+    extended: false
+}));
+
+app.use(bodyParser.json({
+    limit: '50mb'
+}));
+
 // Pass the passport middleware
 app.use(passport.initialize());
 

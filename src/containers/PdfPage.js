@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import URLSearchParams from "url-search-params";
+import MyLocalize from '../modules/Localize';
+import Auth from '../modules/Auth';
 
 import {
   PdfLoader,
@@ -11,7 +13,6 @@ import {
 } from "react-pdf-annotator";
 
 import testHighlights from "../modules/test-highlights";
-
 import Spinner from "../modules/Spinner";
 import Sidebar from "../modules/Sidebar";
 import { getws } from './../WebSocket'
@@ -43,12 +44,12 @@ const HighlightPopup = ({ comment }) =>
     </div>
   ) : null;
 
-const DEFAULT_URL = "https://arxiv.org/pdf/1708.08021.pdf";
+const DEFAULT_URL = "/5ac938da82dd7f92175881aa";
 //const DEFAULT_URL = "http://localhost:3000/pdf/eesti_infouhiskonna_arengukava.pdf";
 //const DEFAULT_URL = "file:///Users/mcanet/Dropbox/OpenData-workshop2018/electron-with-create-react-app/build/static/pdf/eesti_infouhiskonna_arengukava.pdf";
 
 const searchParams = new URLSearchParams(window.location.search);
-const url = searchParams.get("url") || DEFAULT_URL;
+const url = "/"+searchParams.get("url");// ||
 
 async function getAnnotationsJson(filePath) {
   try {
@@ -61,10 +62,11 @@ async function getAnnotationsJson(filePath) {
   }
 }
 
-
 class PdfPage extends Component<Props, State> {
 
   state = {
+    pdf_id: '',
+    selectedOption: '',
     highlights: testHighlights[url] ? [...testHighlights[url]] : []
   };
 
@@ -75,6 +77,36 @@ class PdfPage extends Component<Props, State> {
       highlights: []
     });
   };
+
+  loadAllPDFAnnotations = () => {
+    //var formData = new FormData();
+    //formData.append('pdf_id',this.state.pdf_id)
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('get', '/api/getAllPDFAnnotations?id='+searchParams.get("id"));
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    // set the authorization HTTP header
+    xhr.setRequestHeader('Authorization', `bearer ${Auth.getToken()}`);
+    xhr.responseType = 'json';
+    xhr.addEventListener('load', () => {
+      if (xhr.status === 200) {
+        console.log('getAllAnnotations from server: ',xhr.response);
+
+        this.setState({
+          highlights: xhr.response,
+        });
+      }
+    });
+    xhr.send();
+  }
+
+  handleChange = (selectedOption) => {
+    //this.setState({ selectedOption });
+    //console.log(`Selected: ${selectedOption.label}`);
+
+    console.log(selectedOption);
+    //console.log(document.getElementById(selectedOption).value);
+  }
 
   deleteHighlights = (id) => {
     var previousLen = this.state.highlights.length;
@@ -87,12 +119,23 @@ class PdfPage extends Component<Props, State> {
     });
 
     // Send to delete for all
-    let ws = getws();
-    ws.send('deleteAnnotation',{'type':'deleteHighlights','id':id});
-  };
+    //let ws = getws();
+    //ws.send('deleteAnnotation',{'type':'deleteHighlights','id':id});
 
-  loadNewPDF = () => {
-    getAnnotationsJson('http://localhost:3000/mmm.json');
+    // Delete annotation to server
+    const xhr = new XMLHttpRequest();
+    xhr.open('get', '/api/deletePDFAnnotation?pdfID='+searchParams.get("id")+'&annotationID='+id);
+
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    // set the authorization HTTP header
+    xhr.setRequestHeader('Authorization', `bearer ${Auth.getToken()}`);
+    xhr.responseType = 'json';
+    xhr.addEventListener('load', () => {
+      if (xhr.status === 200) {
+        console.log('Saved the Annotations to server: ',xhr.response)
+      }
+    });
+    xhr.send();
   };
 
   scrollViewerTo = (highlight: any) => {};
@@ -111,6 +154,8 @@ class PdfPage extends Component<Props, State> {
       this.scrollToHighlightFromHash,
       false
     );
+    // load Annotation
+    this.loadAllPDFAnnotations();
   }
 
   getHighlightById(id: string) {
@@ -126,12 +171,30 @@ class PdfPage extends Component<Props, State> {
 
     //var newJson = {:highlights};
     //console.log(highlights);
-    let ws = getws();
-    ws.send('annotation',{'file':'saveAnnotations','data':highlights});
+    //let ws = getws();
+    //ws.send('annotation',{'file':'saveAnnotations','data':highlights});
 
+    var newHighlight = { ...highlight, id: getNextId() };
     this.setState({
-      highlights: [{ ...highlight, id: getNextId() }, ...highlights]
+      highlights: [newHighlight, ...highlights]
     });
+
+    // save to server
+    var annotationObj = JSON.stringify(newHighlight);
+    console.log(annotationObj)
+    const xhr = new XMLHttpRequest();
+    xhr.open('get', '/api/savePDFAnnotation?id='+searchParams.get("id")+'&info='+annotationObj);
+
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    // set the authorization HTTP header
+    xhr.setRequestHeader('Authorization', `bearer ${Auth.getToken()}`);
+    xhr.responseType = 'json';
+    xhr.addEventListener('load', () => {
+      if (xhr.status === 200) {
+        console.log('Saved the Annotations to server: ',xhr.response)
+      }
+    });
+    xhr.send();
   }
 
   updateHighlight(highlightId: string, position: Object, content: Object) {
@@ -158,8 +221,9 @@ class PdfPage extends Component<Props, State> {
         <Sidebar
           highlights={highlights}
           resetHighlights={this.resetHighlights}
-          loadNewPDF={this.loadNewPDF}
           deleteHighlights={this.deleteHighlights}
+          handleChange={this.handleChange}
+          state = {this.state}
         />
 
         <div
