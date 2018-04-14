@@ -83,16 +83,18 @@ function Sidebar({ highlights, resetHighlights, deleteHighlights, handleChange, 
 
         ))}
       </ul>
-      {highlights.length > 0 ? (
-        <div style={{ padding: "1rem" }}>
-          <a href="#" onClick={resetHighlights}>
-            Reset highlights
-          </a>
-        </div>
-      ) : null}
+
     </div>
   );
 }
-
+/*
+{highlights.length > 0 ? (
+  <div style={{ padding: "1rem" }}>
+    <a href="#" onClick={resetHighlights}>
+      Reset highlights
+    </a>
+  </div>
+) : null}
+*/
 export default Sidebar;
 /* deleteHighlights id={highlight.id}*/

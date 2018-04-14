@@ -22,39 +22,6 @@ router.get('/getUserData', (req, res) => {
   });
 });
 
-router.get('/generateThumbnail', (req, res) => {
-// https://github.com/agentcooper/pdf-annotation-service
-/*
-let annotations = [];
- try {
-   const urlObject = urlTools.parse(req.url, true);
-   annotations = JSON.parse(urlObject.query.annotations);
- } catch (e) {
-   res.end('Fail');
- }
-
- let body = [];
-
- req
-   .on('data', chunk => {
-     body.push(chunk);
-   })
-   .on('end', () => {
-     body = Buffer.concat(body);
-     console.log('Got buffer');
-
-     const inStream = new PDFRStreamForBuffer(body);
-     const outStream = new hummus.PDFStreamForResponse(res);
-
-     console.log('Working...');
-     work(annotations, inStream, outStream);
-
-     console.log('Done');
-     res.end();
-   });
-*/
-});
-
 router.get('/downloadFile', (req, res) => {
   console.log(req.query);
   console.log('router download:','/'+req.query.path, req.query.downloadname)
@@ -99,8 +66,10 @@ router.get('/savePDFAnnotation', (req, res) => {
     if(cb.retStatus=='success'){
       console.log('save Annotations - success',cb.data)
       res.status(200).json();
+      // Generate new SVG from new annotation
+      pdfUtils.generateSVG(req.query.id,120,200);
     }else{
-      console.log('save Annotations - error')
+      console.log('save Annotations - error');
       res.status(400).json();
     }
   });
@@ -108,18 +77,16 @@ router.get('/savePDFAnnotation', (req, res) => {
 });
 
 router.get('/getAllPDFAnnotations', (req, res) => {
-  console.log(req.user);
   console.log("called /getAllPDFAnnotations id:",req.query.id)
   pdf.getAnnotations(req.query.id,function(cb){
     if(cb.retStatus=='success'){
-      console.log('getAnnotations - success',cb.data)
+      console.log('getAnnotations - success');
       res.status(200).json(cb.data);
     }else{
-      console.log('getAnnotations - error')
+      console.log('getAnnotations - error');
       res.status(200).json({});
     }
   });
-
 });
 
 // Upload PDF to server
@@ -133,6 +100,7 @@ router.post('/uploadPDF', upload.single('pdf'), (req, res) => {
   path = "./"+req.file.path+".pdf";
   console.log("path: "+path);
   */
+  try{
   var pdfInfo = pdfUtils.extractInfo(path,function(pdfInfo){
     console.log('user:',req.body.user);
     // Save in Database
@@ -141,6 +109,8 @@ router.post('/uploadPDF', upload.single('pdf'), (req, res) => {
     newPdf.originalname = req.file.originalname;
     newPdf.path = req.file.path;
     newPdf.description = req.body.description;
+    // get size
+    pdfInfo.documentSize = pdfUtils.getDocumentSize(pdfInfo);
     newPdf.pdfInfo = pdfInfo;
     newPdf.author = req.user.name;
     newPdf.authorID = req.user._id;
@@ -152,12 +122,47 @@ router.post('/uploadPDF', upload.single('pdf'), (req, res) => {
 		  }else{
 			   console.log('Saved pdf');
          res.status(200).json({});
+         // save empty SVG
+         console.log("data",data);
+         pdfUtils.saveSVGThumbnail(data._id,120,200,'');
 		  }
     });
   });
+}catch(err){}
 
   // respond that file got uploaded
   //res.status(200).json({});
 });
 
 module.exports = router;
+
+// https://github.com/agentcooper/pdf-annotation-service
+/*
+let annotations = [];
+ try {
+   const urlObject = urlTools.parse(req.url, true);
+   annotations = JSON.parse(urlObject.query.annotations);
+ } catch (e) {
+   res.end('Fail');
+ }
+
+ let body = [];
+
+ req
+   .on('data', chunk => {
+     body.push(chunk);
+   })
+   .on('end', () => {
+     body = Buffer.concat(body);
+     console.log('Got buffer');
+
+     const inStream = new PDFRStreamForBuffer(body);
+     const outStream = new hummus.PDFStreamForResponse(res);
+
+     console.log('Working...');
+     work(annotations, inStream, outStream);
+
+     console.log('Done');
+     res.end();
+   });
+*/

@@ -11,6 +11,7 @@ var server = require('http').createServer(app);
 // Tell the app to look for static files in these directories
 app.use(express.static('./build/'));
 app.use(express.static('./pdfUpload/'));
+app.use(express.static('./svgThumbnails/'));
 
 // Tell the app to parse HTTP body messages
 app.use(bodyParser.urlencoded({

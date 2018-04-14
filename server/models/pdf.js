@@ -9,6 +9,10 @@ const AnnotationSchema = new Schema({
         type:Object,
         required:true
     },
+    sortPosition:{
+        type:Number,
+        required:true
+    },
     position:{
         type:Object,
         required:true
@@ -96,12 +100,16 @@ PDFSchema.statics = {
     var AnnotationModel = mongoose.model('Annotation',AnnotationSchema);
 
     var annotationModel = new AnnotationModel();
-    // original fields
+    // Original fields
     annotationModel.content = info.content;
     annotationModel.position = info.position;
     annotationModel.comment = info.comment;
     annotationModel.id = info.id;
-    // added fields
+
+    // position first annotation in the page
+    annotationModel.sortPosition = parseFloat(info.position.pageNumber)+(parseFloat(info.position.rects[0].y1)/10000);
+
+    // Added fields
     annotationModel.authorID = authorID;
     annotationModel.author = author;
 
@@ -116,6 +124,7 @@ PDFSchema.statics = {
             if (pdf) {
                 console.log('id pdf found',pdf._id)
                 pdf.annotations.push(annotationModel);
+
                 pdf.save(function(err) {
                   if(err){
                     console.log('error saving comment',err)
@@ -192,6 +201,32 @@ PDFSchema.statics = {
                     cb({
                         retStatus: "success",
                         data: pdf.annotations
+                    });
+            } else {
+                cb({
+                    retStatus: "failure",
+                    data: {}
+                });
+            }
+        }
+    });
+  },
+  // Get all annotations -------------------------------------------------------------------------
+  getPDF : function(pdfID, cb) {
+    var PdfModel = mongoose.model('pdf',PDFSchema);
+
+    // find PDF to add new annotations
+    PdfModel.findOne({_id: pdfID}, function(err, pdf) {
+        if (err) {
+            cb({
+                retStatus: "failure",
+                message: "Pdf annotation failed : " + util.inspect(err)
+            });
+        } else {
+            if (pdf) {
+                    cb({
+                        retStatus: "success",
+                        data: pdf
                     });
             } else {
                 cb({

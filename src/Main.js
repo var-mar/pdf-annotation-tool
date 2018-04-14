@@ -20,6 +20,7 @@ import LoginPage from './containers/LoginPage.jsx';
 import LogoutFunction from './containers/LogoutFunction.jsx';
 import SignUpPage from './containers/SignUpPage.jsx';
 import DashboardPage from './containers/DashboardPage.jsx';
+import HomePage from './containers/HomePage.jsx';
 import Auth from './modules/Auth';
 import PdfPage from './containers/PdfPage';
 import AboutPage from './containers/AboutPage.jsx';
@@ -99,7 +100,6 @@ class Main extends Component {
               {this.state.authenticated ? (
                 <div className="top-bar-right">
                   <Link to="/dashboard">{MyLocalize.translate('Dashboard')}</Link>
-                  <Link to="/pdf">{MyLocalize.translate('Annotate PDF')}</Link>
                   <Link to="/about">{MyLocalize.translate('About')}</Link>
                   <Link to="/logout">{MyLocalize.translate('Log out')}</Link>
                 </div>
@@ -113,7 +113,8 @@ class Main extends Component {
 
             </div>
 
-            <PropsRoute exact path="/" component={DashboardPage} toggleAuthenticateStatus={() => this.toggleAuthenticateStatus()} />
+            <PropsRoute exact path="/" component={HomePage} toggleAuthenticateStatus={() => this.toggleAuthenticateStatus()} />
+            <PrivateRoute path="/dashboard" component={DashboardPage}/>
             <PrivateRoute path="/pdf" component={PdfPage}/>
             <LoggedOutRoute path="/login" component={LoginPage} toggleAuthenticateStatus={() => this.toggleAuthenticateStatus()} />
             <LoggedOutRoute path="/signup" component={SignUpPage}/>

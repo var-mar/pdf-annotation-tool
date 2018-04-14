@@ -27,7 +27,7 @@ class AboutPage extends React.Component {
     return (
     <div className="container">
     <p style={{ fontSize: '16px', color: 'black' }}> This tool has been made by <a href="http://var-mar.info/">Varvara & Mar</a> with the support of Eesti open data.</p>
-    <p style={{ fontSize: '16px', color: 'black' }}> The tool is open source and it is publish in github account: <a href="https://github.com/var-mar/pdf-annotation-tool">https://github.com/var-mar/pdf-annotation-tool</a>.</p>
+    <p style={{ fontSize: '16px', color: 'black' }}> The tool is open source and it is publish in github account: <a href="https://github.com/Demokraatialabor/pdf-annotation-tool">https://github.com/var-mar/pdf-annotation-tool</a>.</p>
     </div>);
   }
 

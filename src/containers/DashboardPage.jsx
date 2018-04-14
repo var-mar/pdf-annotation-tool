@@ -130,10 +130,11 @@ class DashboardPage extends React.Component {
             >
               <div>
                 <strong>{pdf.originalname}</strong><br/>
+                <img src={pdf._id+".svg"} width="120" height="200" class="svg"/>
                 {MyLocalize.translate('Description')}: {pdf.description}<br/>
                 {MyLocalize.translate('Pages')+": "+ pdf.pdfInfo.pdfInfo.numPages} |
                 {MyLocalize.translate('Total annotations') +": "+ pdf.annotations.length}
-                | <a href="#" onClick={(e)=>{this.downloadPDF(e,pdf.path,pdf.originalname)}}>{MyLocalize.translate('Download original')}</a> 
+                | <a href="#" onClick={(e)=>{this.downloadPDF(e,pdf.path,pdf.originalname)}}>{MyLocalize.translate('Download original')}</a>
                 | <a href="#" onClick={(e)=>{this.downloadPDFAnnotated(e,pdf._id,pdf.path,pdf.originalname.split('.')[0]+'_annotated.pdf')}}>{MyLocalize.translate('Download annotated PDF')}</a>
               </div>
             </li>

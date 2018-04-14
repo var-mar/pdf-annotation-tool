@@ -11,8 +11,7 @@ import {
   Popup,
   AreaHighlight
 } from "react-pdf-annotator";
-
-import testHighlights from "../modules/test-highlights";
+import { _ } from 'underscore'
 import Spinner from "../modules/Spinner";
 import Sidebar from "../modules/Sidebar";
 import { getws } from './../WebSocket'
@@ -67,7 +66,7 @@ class PdfPage extends Component<Props, State> {
   state = {
     pdf_id: '',
     selectedOption: '',
-    highlights: testHighlights[url] ? [...testHighlights[url]] : []
+    highlights: []
   };
 
   state: State;
@@ -93,7 +92,7 @@ class PdfPage extends Component<Props, State> {
         console.log('getAllAnnotations from server: ',xhr.response);
 
         this.setState({
-          highlights: xhr.response,
+          highlights: _.sortBy(xhr.response,'sortPosition'),
         });
       }
     });
@@ -175,9 +174,19 @@ class PdfPage extends Component<Props, State> {
     //ws.send('annotation',{'file':'saveAnnotations','data':highlights});
 
     var newHighlight = { ...highlight, id: getNextId() };
+    /*
     this.setState({
       highlights: [newHighlight, ...highlights]
     });
+    */
+    // sort annotations
+    //setTimeOut(500,function(){
+    /*
+    	this.setState({
+          highlights: _.sortBy(this.state.highlights,'sortPosition'),
+    	});
+    */
+    //});
 
     // save to server
     var annotationObj = JSON.stringify(newHighlight);
@@ -191,6 +200,8 @@ class PdfPage extends Component<Props, State> {
     xhr.responseType = 'json';
     xhr.addEventListener('load', () => {
       if (xhr.status === 200) {
+
+        this.loadAllPDFAnnotations();
         console.log('Saved the Annotations to server: ',xhr.response)
       }
     });

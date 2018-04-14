@@ -67,7 +67,12 @@ body {
 }
 
 .pdfbar a:hover{
-  text-decoration:underline; 
+  text-decoration:underline;
+}
+
+.svg{
+  border: 1px solid black;
+  background-color:white
 }
 
 a {
