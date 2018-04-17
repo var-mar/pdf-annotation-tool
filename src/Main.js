@@ -20,6 +20,7 @@ import LoginPage from './containers/LoginPage.jsx';
 import LogoutFunction from './containers/LogoutFunction.jsx';
 import SignUpPage from './containers/SignUpPage.jsx';
 import DashboardPage from './containers/DashboardPage.jsx';
+import LegendsPage from './containers/LegendsPage.jsx';
 import HomePage from './containers/HomePage.jsx';
 import Auth from './modules/Auth';
 import PdfPage from './containers/PdfPage';
@@ -33,7 +34,7 @@ let ws = initws();
 // remove tap delay, essential for MaterialUI to work properly
 injectTapEventPlugin();
 
-console.log('version:1.2');
+console.log('version:1.4');
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={props => (
@@ -100,6 +101,7 @@ class Main extends Component {
               {this.state.authenticated ? (
                 <div className="top-bar-right">
                   <Link to="/dashboard">{MyLocalize.translate('Dashboard')}</Link>
+                  <Link to="/legends">{MyLocalize.translate('Annotation legends')}</Link>
                   <Link to="/about">{MyLocalize.translate('About')}</Link>
                   <Link to="/logout">{MyLocalize.translate('Log out')}</Link>
                 </div>
@@ -115,6 +117,7 @@ class Main extends Component {
 
             <PropsRoute exact path="/" component={HomePage} toggleAuthenticateStatus={() => this.toggleAuthenticateStatus()} />
             <PrivateRoute path="/dashboard" component={DashboardPage}/>
+            <PrivateRoute path="/legends" component={LegendsPage}/>
             <PrivateRoute path="/pdf" component={PdfPage}/>
             <LoggedOutRoute path="/login" component={LoginPage} toggleAuthenticateStatus={() => this.toggleAuthenticateStatus()} />
             <LoggedOutRoute path="/signup" component={SignUpPage}/>

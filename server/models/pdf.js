@@ -31,6 +31,11 @@ const AnnotationSchema = new Schema({
         required:false,
         default:""
     },
+    typeColor:{
+        type:String,
+        required:false,
+        default:"#FF0000"
+    },
     authorID:{
         type:String,
         required:true,
@@ -107,7 +112,7 @@ PDFSchema.statics = {
     annotationModel.id = info.id;
 
     // position first annotation in the page
-    annotationModel.sortPosition = parseFloat(info.position.pageNumber)+(parseFloat(info.position.rects[0].y1)/10000);
+    annotationModel.sortPosition = parseFloat(info.position.pageNumber)+(parseFloat(info.position.rects[0].y1/info.position.rects[0].height));
 
     // Added fields
     annotationModel.authorID = authorID;
@@ -150,38 +155,19 @@ PDFSchema.statics = {
   removeAnnotation : function(pdfID, annotationID, authorID, cb) {
     var PdfModel = mongoose.model('pdf',PDFSchema);
 
-    // find PDF to add new annotations
-    PdfModel.findOne({_id: pdfID}, function(err, pdf) {
+    PdfModel.findByIdAndUpdate(
+      pdfID, { $pull: { "annotations": { id: annotationID, authorID: authorID } } }, { safe: true, upsert: true },
+      function(err, data) {
         if (err) {
-            cb({
-                retStatus: "failure",
-                message: "Pdf annotation failed : " + util.inspect(err)
-            });
-        } else {
-            if (pdf) {
-                console.log('found PDF');
-                pdf.annotations.remove({ id: annotationID, authorID: authorID }, function(err) {
-                  if(err){
-                    console.log("Annotation deleted");
-                    cb({
-                        retStatus: "success",
-                        message: "Annotation deleted"
-                    });
-
-                  }else{
-                    console.log("failure",err);
-                    cb({
-                        retStatus: "failure",
-                        message: "Pdf found but comment not found"
-                    });
-                 }});
-            } else {
-                console.log('Not found PDF');
-                cb({
-                    retStatus: "failure",
-                    message: "Pdf not found"
-                });
-            }
+          cb({
+              retStatus: "failure",
+              message: "Pdf annotation failed : " + util.inspect(err)
+          });
+        }else{
+          cb({
+              retStatus: "success",
+              message: "Annotation deleted"
+          });
         }
     });
   },
@@ -237,6 +223,7 @@ PDFSchema.statics = {
         }
     });
   }
+
 
 };
 

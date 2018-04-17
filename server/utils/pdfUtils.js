@@ -1,6 +1,7 @@
 const PDFExtract = require('pdf.js-extract').PDFExtract;
 const pdf = require('../models/pdf');
 const fs = require('fs');
+const _ = require('underscore');
 
 exports.extractInfo = function(path,callback){
       var pdfExtract = new PDFExtract();
@@ -78,4 +79,17 @@ exports.getDocumentSize = function(info){
     }
   }
   return {width:widthMax,height:totalHeight};
+}
+
+exports.filterAuthorId = function(json,authorId){
+  for(var i=0;i<json.length;i++){
+      json[i] = json[i].toObject();
+      if(json[i]['authorID'] == authorId){
+        json[i]['areYouTheAuthor'] = true;
+      }else{
+        json[i]['areYouTheAuthor'] = false;
+      }
+      delete json[i]['authorID'];
+  }
+  return json;
 }

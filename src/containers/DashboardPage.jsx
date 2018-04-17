@@ -28,8 +28,31 @@ class DashboardPage extends React.Component {
    downloadPDF = (event,path,downloadName)=>{
      event.stopPropagation();
      console.log('Call download');
+     // Send in API
+     var requestUrl = '/api/downloadFile?path='+path+'&downloadname='+downloadName;
+     var xhr = new XMLHttpRequest();
+     xhr.open("GET", requestUrl);
+     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+     xhr.setRequestHeader('Authorization', `bearer ${Auth.getToken()}`);
+     xhr.responseType = "arraybuffer";
+     xhr.onload = function () {
+        if (this.status === 200) {
+          var blob = new Blob([xhr.response], {type: "application/pdf"});
+          //var objectUrl = URL.createObjectURL(blob);
+          //window.open(objectUrl);
+          fileDownload(blob, downloadName);
+        }
+     };
+     xhr.send();
+   }
 
-      var requestUrl = '/api/downloadFile?path='+path+'&downloadname='+downloadName;
+  deletePDF = (event,id,path) => {
+    event.stopPropagation();
+    console.log('Call delete pdf');
+    // Save in API
+    var self = this;
+    if (window.confirm("Do you really want to delete?")) {
+      var requestUrl = '/api/deletePDF?id='+id+"&path="+path;
       var xhr = new XMLHttpRequest();
       xhr.open("GET", requestUrl);
       xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
@@ -37,40 +60,35 @@ class DashboardPage extends React.Component {
       xhr.responseType = "arraybuffer";
       xhr.onload = function () {
         if (this.status === 200) {
-          var blob = new Blob([xhr.response], {type: "application/pdf"});
-          //var objectUrl = URL.createObjectURL(blob);
-          //window.open(objectUrl);
-          fileDownload(blob, downloadName);
+          self.loadAllPDF();
         }
       };
       xhr.send();
-   }
+    }
+  }
 
   downloadPDFAnnotated = (event,id,path,downloadName) => {
     event.stopPropagation();
     console.log('Call download annotated');
-
-     var requestUrl = '/api//downloadAnnotatedFile?id='+id+'&path='+path+'&downloadname='+downloadName;
-     var xhr = new XMLHttpRequest();
-     xhr.open("GET", requestUrl);
-     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-     xhr.setRequestHeader('Authorization', `bearer ${Auth.getToken()}`);
-     xhr.responseType = "arraybuffer";
-     xhr.onload = function () {
+    // Send to API
+    var requestUrl = '/api/downloadAnnotatedFile?id='+id+'&path='+path+'&downloadname='+downloadName;
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", requestUrl);
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('Authorization', `bearer ${Auth.getToken()}`);
+    xhr.responseType = "arraybuffer";
+    xhr.onload = function () {
        if (this.status === 200) {
          var blob = new Blob([xhr.response], {type: "application/pdf"});
          //var objectUrl = URL.createObjectURL(blob);
          //window.open(objectUrl);
          fileDownload(blob, downloadName);
        }
-     };
-     xhr.send();
+    };
+    xhr.send();
   }
 
   loadAllPDF = () => {
-    //var formData = new FormData();
-    //formData.append('user_id',this.state.user_id)
-
     const xhr = new XMLHttpRequest();
     xhr.open('get', '/api/getAllPDF');
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
@@ -99,7 +117,6 @@ class DashboardPage extends React.Component {
    */
 
   render() {
-
     return (
     <div className="App" style={{ display: "flex", height: "100vh" }}>
         <div className="sidebar" style={{ width: "25vw",padding:'15px' }}>
@@ -115,10 +132,9 @@ class DashboardPage extends React.Component {
             overflowY: "scroll",
             position: "relative"
           }}
-
           className="pdfbar"
         >
-        <p>PDF List </p>
+        <p>PDF List</p>
         <ul className="pdf__item">
           {this.state.pdfAr.map((pdf, index) => (
             <li
@@ -128,14 +144,16 @@ class DashboardPage extends React.Component {
                 this.openPdf(pdf._id,pdf.filename);
               }}
             >
-              <div>
+              <div style={{'overflow': 'hidden'}}>
+
+                <div style={{'float':'left','height':202,'display':'inline-block'}}><img src={pdf._id+".svg"} width="120" height="200" class="svg"/></div>
                 <strong>{pdf.originalname}</strong><br/>
-                <img src={pdf._id+".svg"} width="120" height="200" class="svg"/>
                 {MyLocalize.translate('Description')}: {pdf.description}<br/>
-                {MyLocalize.translate('Pages')+": "+ pdf.pdfInfo.pdfInfo.numPages} |
-                {MyLocalize.translate('Total annotations') +": "+ pdf.annotations.length}
-                | <a href="#" onClick={(e)=>{this.downloadPDF(e,pdf.path,pdf.originalname)}}>{MyLocalize.translate('Download original')}</a>
-                | <a href="#" onClick={(e)=>{this.downloadPDFAnnotated(e,pdf._id,pdf.path,pdf.originalname.split('.')[0]+'_annotated.pdf')}}>{MyLocalize.translate('Download annotated PDF')}</a>
+                {MyLocalize.translate('Pages')+": "+ pdf.pdfInfo.pdfInfo.numPages} <br/>
+                {MyLocalize.translate('Total annotations') +": "+ pdf.annotations.length}<br/>
+                <a href="#" onClick={(e)=>{this.downloadPDF(e,pdf.path,pdf.originalname)}}>{MyLocalize.translate('Download original')}</a><br/>
+                <a href="#" onClick={(e)=>{this.downloadPDFAnnotated(e,pdf._id,pdf.path,pdf.originalname.split('.')[0]+'_annotated.pdf')}}>{MyLocalize.translate('Download annotated PDF')}</a><br/>
+                {pdf.areYouTheAuthor?(<a href="#" onClick={(e)=>{this.deletePDF(e,pdf._id,pdf.path)}}>{MyLocalize.translate('Delete')}</a>):null}
               </div>
             </li>
           ))}

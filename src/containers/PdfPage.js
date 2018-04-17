@@ -6,16 +6,18 @@ import Auth from '../modules/Auth';
 import {
   PdfLoader,
   PdfAnnotator,
-  Tip,
-  Highlight,
+  /*Tip,*/
+  /*Highlight,*/
   Popup,
   AreaHighlight
 } from "react-pdf-annotator";
+import Tip from "../modules/Tip";
+import Highlight from "../modules/Highlight";
+
 import { _ } from 'underscore'
 import Spinner from "../modules/Spinner";
 import Sidebar from "../modules/Sidebar";
 import { getws } from './../WebSocket'
-
 import type { T_Highlight, T_NewHighlight } from "../src/types";
 
 import "../style/Pdf.css";
@@ -43,12 +45,8 @@ const HighlightPopup = ({ comment }) =>
     </div>
   ) : null;
 
-const DEFAULT_URL = "/5ac938da82dd7f92175881aa";
-//const DEFAULT_URL = "http://localhost:3000/pdf/eesti_infouhiskonna_arengukava.pdf";
-//const DEFAULT_URL = "file:///Users/mcanet/Dropbox/OpenData-workshop2018/electron-with-create-react-app/build/static/pdf/eesti_infouhiskonna_arengukava.pdf";
-
 const searchParams = new URLSearchParams(window.location.search);
-const url = "/"+searchParams.get("url");// ||
+const url = "/"+searchParams.get("url");
 
 async function getAnnotationsJson(filePath) {
   try {
@@ -174,19 +172,6 @@ class PdfPage extends Component<Props, State> {
     //ws.send('annotation',{'file':'saveAnnotations','data':highlights});
 
     var newHighlight = { ...highlight, id: getNextId() };
-    /*
-    this.setState({
-      highlights: [newHighlight, ...highlights]
-    });
-    */
-    // sort annotations
-    //setTimeOut(500,function(){
-    /*
-    	this.setState({
-          highlights: _.sortBy(this.state.highlights,'sortPosition'),
-    	});
-    */
-    //});
 
     // save to server
     var annotationObj = JSON.stringify(newHighlight);
@@ -245,6 +230,7 @@ class PdfPage extends Component<Props, State> {
             position: "relative"
           }}
         >
+
           <PdfLoader url={url} beforeLoad={<Spinner />}>
             {pdfDocument => (
               <PdfAnnotator
@@ -290,6 +276,7 @@ class PdfPage extends Component<Props, State> {
                       isScrolledTo={isScrolledTo}
                       position={highlight.position}
                       comment={highlight.comment}
+                      typeColor={highlight.typeColor}
                     />
                   ) : (
                     <AreaHighlight

@@ -41,10 +41,21 @@ router.get('/downloadAnnotatedFile', (req, res) => {
 
 router.get('/getAllPDF', (req, res) => {
   pdf.find({},(err,docs)=>{
-    res.status(200).json(docs)
+    res.status(200).json(pdfUtils.filterAuthorId(docs,req.user._id))
   });
 });
 
+router.get('/getLegend', (req, res) => {
+  res.status(200).json( [{
+ 	"name": "type1",
+ 	"color": "#FF00FF"
+ }, {
+ 	"name": "type2",
+ 	"color": "#FF0000"
+ }]);
+});
+
+// this delete one annotation in the PDF
 router.get('/deletePDFAnnotation', (req, res) => {
   console.log('called /deletePDFAnnotation:',req.query.pdfID, req.query.annotationID, req.user._id)
   pdf.removeAnnotation(req.query.pdfID, req.query.annotationID, req.user._id, function(cb){
@@ -56,6 +67,18 @@ router.get('/deletePDFAnnotation', (req, res) => {
       res.status(400).json();
     }
   });
+});
+
+// This delete PDF
+router.get('/deletePDF', (req, res) => {
+  console.log('Called /deletePDF');
+  // delete in database
+  pdf.findByIdAndRemove(req.query.id, function (err, user) {
+  });
+  //detele file
+  fs.unlink(req.query.path, function (err) {
+  });
+  res.status(200).json();
 });
 
 router.get('/savePDFAnnotation', (req, res) => {
@@ -81,7 +104,8 @@ router.get('/getAllPDFAnnotations', (req, res) => {
   pdf.getAnnotations(req.query.id,function(cb){
     if(cb.retStatus=='success'){
       console.log('getAnnotations - success');
-      res.status(200).json(cb.data);
+      var json = pdfUtils.filterAuthorId(cb.data,req.user._id);
+      res.status(200).json(json);
     }else{
       console.log('getAnnotations - error');
       res.status(200).json({});

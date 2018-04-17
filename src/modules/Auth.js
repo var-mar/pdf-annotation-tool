@@ -36,6 +36,16 @@ class Auth {
     return localStorage.getItem('token');
   }
 
+  /**
+   * Get a user id value.
+   *
+   * @returns {string}
+   */
+
+  static getUserId() {
+    return localStorage.getItem('userId');
+  }
+
 }
 
 export default Auth;

@@ -100,3 +100,7 @@ blockquote:after {
   font-size: 10px;
   color: #d35400;
 }
+
+.formFilter{
+  width:75px;
+}
