@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 const config = require('../config');
+const path = require('path');
 
 // Connect to the database and load models
 require('./models').connect(config.dbUri);
@@ -12,6 +13,7 @@ var server = require('http').createServer(app);
 app.use(express.static('./build/'));
 app.use(express.static('./pdfUpload/'));
 app.use(express.static('./svgThumbnails/'));
+
 
 // Tell the app to parse HTTP body messages
 app.use(bodyParser.urlencoded({
@@ -26,6 +28,23 @@ app.use(bodyParser.json({
 
 // Pass the passport middleware
 app.use(passport.initialize());
+
+// Redirect to all routes not defined
+app.get('/dashboard', function(req, res) {
+  res.sendFile(path.join(__dirname, '../build/index.html'), function(err) {
+    if (err) res.status(500).send(err)
+  })
+});
+app.get('/pdf', function(req, res) {
+  res.sendFile(path.join(__dirname, '../build/index.html'), function(err) {
+    if (err) res.status(500).send(err)
+  })
+});
+app.get('/about', function(req, res) {
+  res.sendFile(path.join(__dirname, '../build/index.html'), function(err) {
+    if (err) res.status(500).send(err)
+  })
+});
 
 // Load passport strategies
 const localSignupStrategy = require('./passport/local-signup');

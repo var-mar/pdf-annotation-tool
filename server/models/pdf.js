@@ -1,6 +1,21 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const util = require('util');
+//const pdfUtils = require('../utils/pdfUtils');
+
+
+var filterAuthorId = function(json,authorId){
+  for(var i=0;i<json.length;i++){
+      json[i] = json[i].toObject();
+      if(json[i]['authorID'] == authorId){
+        json[i]['areYouTheAuthor'] = true;
+      }else{
+        json[i]['areYouTheAuthor'] = false;
+      }
+      delete json[i]['authorID'];
+  }
+  return json;
+}
 
 // Define the Annotation model schema
 const AnnotationSchema = new Schema({
@@ -31,11 +46,6 @@ const AnnotationSchema = new Schema({
         required:false,
         default:""
     },
-    typeColor:{
-        type:String,
-        required:false,
-        default:"#FF0000"
-    },
     authorID:{
         type:String,
         required:true,
@@ -51,6 +61,52 @@ const AnnotationSchema = new Schema({
         required:false,
         default: Date.now
     }
+});
+
+// Define the Legend model schema
+
+//COLORS = ['red', 'blue', ...];
+
+function colorValidator (v) {
+    if (v.indexOf('#') == 0) {
+        if (v.length == 7) {  // #f0f0f0
+            return true;
+        } else if (v.length == 4) {  // #fff
+            return true;
+        }
+    }
+    return false;//COLORS.indexOf(v) > -1;
+};
+
+const LegendItemSchema = new Schema({
+  name:{
+      type:String,
+      required:true
+  },
+  color: {
+    type: String,
+    validate: [colorValidator, 'not a valid color'],
+    required:true
+  },
+  sortPosition:{
+    type:Number,
+    required:false
+  },
+  authorID:{
+      type:String,
+      required:true,
+      default:"anonymous"
+  },
+  author:{
+      type:String,
+      required:true,
+      default:"anonymous"
+  },
+  createDate:{
+      type:String,
+      required:false,
+      default: Date.now
+  }
 });
 
 // Define the Pdf model schema
@@ -84,6 +140,7 @@ const PDFSchema = new Schema({
         required:true
     },
     annotations: {type: [AnnotationSchema]},
+    legends:{type:[LegendItemSchema]},
     createDate:{
         type:Date,
         required:false,
@@ -103,13 +160,14 @@ PDFSchema.statics = {
   saveAnnotation : function(pdfID, info, authorID,author, cb) {
     var PdfModel = mongoose.model('pdf',PDFSchema);
     var AnnotationModel = mongoose.model('Annotation',AnnotationSchema);
-
     var annotationModel = new AnnotationModel();
+
     // Original fields
     annotationModel.content = info.content;
     annotationModel.position = info.position;
     annotationModel.comment = info.comment;
     annotationModel.id = info.id;
+    annotationModel.type = info.type;
 
     // position first annotation in the page
     annotationModel.sortPosition = parseFloat(info.position.pageNumber)+(parseFloat(info.position.rects[0].y1/info.position.rects[0].height));
@@ -118,7 +176,7 @@ PDFSchema.statics = {
     annotationModel.authorID = authorID;
     annotationModel.author = author;
 
-    // find PDF to add new annotations
+    // Find PDF to add new annotations
     PdfModel.findOne({_id: pdfID}, function(err, pdf) {
         if (err) {
             cb({
@@ -149,12 +207,11 @@ PDFSchema.statics = {
             }
         }
     });
-  }
-  ,
+  },
+
   // Remove comment -------------------------------------------------------------------------
   removeAnnotation : function(pdfID, annotationID, authorID, cb) {
     var PdfModel = mongoose.model('pdf',PDFSchema);
-
     PdfModel.findByIdAndUpdate(
       pdfID, { $pull: { "annotations": { id: annotationID, authorID: authorID } } }, { safe: true, upsert: true },
       function(err, data) {
@@ -171,11 +228,11 @@ PDFSchema.statics = {
         }
     });
   },
-  // Get all annotations -------------------------------------------------------------------------
-  getAnnotations : function(pdfID, cb) {
-    var PdfModel = mongoose.model('pdf',PDFSchema);
 
-    // find PDF to add new annotations
+  // Get all annotations -------------------------------------------------------------------------
+  getAnnotations : function(pdfID,userId, cb) {
+    var PdfModel = mongoose.model('pdf',PDFSchema);
+    // Find PDF to add new annotations
     PdfModel.findOne({_id: pdfID}, function(err, pdf) {
         if (err) {
             cb({
@@ -184,24 +241,51 @@ PDFSchema.statics = {
             });
         } else {
             if (pdf) {
-                    cb({
-                        retStatus: "success",
-                        data: pdf.annotations
-                    });
+              pdf.annotations = filterAuthorId(pdf.annotations,userId);
+              pdf.legends = filterAuthorId(pdf.legends,userId);
+              var data = {
+                'annotations': pdf.annotations,
+                'legends': pdf.legends
+              };
+              cb({
+                retStatus: "success",
+                data: data
+              });
             } else {
-                cb({
-                    retStatus: "failure",
-                    data: {}
-                });
+              cb({
+                retStatus: "failure",
+                data: {}
+              });
             }
         }
     });
   },
+
+  updateAnnotation: function(pdfID, userId, annotationId,comment, type, cb) {
+    var PdfModel = mongoose.model('pdf',PDFSchema);
+
+    // Find PDF to add new annotations
+    PdfModel.findOne({_id: pdfID}, function(err, pdf) {
+      pdf.update({ _id: annotationId }, { $set: { 'type': type, 'comment':{'emoji':'','text':comment} }}, function(err){
+        if (err) {
+          cb({
+            retStatus: "failure",
+            message: "Pdf annotation failed : " + util.inspect(err)
+          });
+        } else {
+          cb({
+            retStatus: "success",
+            data: {}
+          });
+        }
+      });
+    });
+  },
+
   // Get all annotations -------------------------------------------------------------------------
   getPDF : function(pdfID, cb) {
     var PdfModel = mongoose.model('pdf',PDFSchema);
-
-    // find PDF to add new annotations
+    // Find PDF to add new annotations
     PdfModel.findOne({_id: pdfID}, function(err, pdf) {
         if (err) {
             cb({
@@ -222,8 +306,23 @@ PDFSchema.statics = {
             }
         }
     });
+  },
+  getAllPDF : function(userId ,cb) {
+    var PdfModel = mongoose.model('pdf',PDFSchema);
+    PdfModel.find({},(err,docs)=>{
+      if (err) {
+          cb({
+              retStatus: "failure",
+              message: "Get All Pdf failed : " + util.inspect(err)
+          });
+      } else {
+                    cb({
+                      retStatus: "success",
+                      data: filterAuthorId(docs,userId)
+                    });
+      }
+    });
   }
-
 
 };
 

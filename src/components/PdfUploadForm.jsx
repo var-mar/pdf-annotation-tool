@@ -49,10 +49,11 @@ type Props = {
 };
 
 const PdfUploadForm = ({ loadAllPDF }: Props) => (
-  <div id="pdfUploadForm">
+  <div id="pdfUploadForm" class="form-style-2">
     <form id="form-pdf-upload" name="form-pdf-upload" method="POST" encType="multipart/form-data">
       <input type="file" name="pdf" accept="application/pdf"/><br/>
-      <span class="formText">Description: </span><input type="text" name="description"/>
+      <label for="description"><span class="formText">Description:</span></label>
+      <textarea class="textarea-field" type="text" name="description" style={{width:200}}/>
     </form>
     <button onClick={() => {sendAttachedPDF(loadAllPDF)}}>{MyLocalize.translate('Save')}</button>
     <p class="formWarnings" id="formOutput"></p>

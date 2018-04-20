@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom'
 import URLSearchParams from "url-search-params";
 import MyLocalize from '../modules/Localize';
 import Auth from '../modules/Auth';
+import PropTypes from 'prop-types';
 
 import {
   PdfLoader,
@@ -46,7 +48,8 @@ const HighlightPopup = ({ comment }) =>
   ) : null;
 
 const searchParams = new URLSearchParams(window.location.search);
-const url = "/"+searchParams.get("url");
+//const url = searchParams.get("url");
+//console.log('url:',url)
 
 async function getAnnotationsJson(filePath) {
   try {
@@ -61,26 +64,51 @@ async function getAnnotationsJson(filePath) {
 
 class PdfPage extends Component<Props, State> {
 
+  static propTypes = {
+      match: PropTypes.object.isRequired,
+      location: PropTypes.object.isRequired,
+      history: PropTypes.object.isRequired
+  }
+
   state = {
     pdf_id: '',
     selectedOption: '',
-    highlights: []
+    highlights: [],
+    legends:[],
   };
 
   state: State;
 
   resetHighlights = () => {
     this.setState({
-      highlights: []
+      highlights: [],
+      legends:[]
     });
   };
+
+  getColorType = (id,legends) => {
+    console.log(id,legends)
+    try{
+      return (legends.find(legendItem => legendItem._id === id)).color;
+    }catch(err){
+      return '';
+    }
+  }
+
+  getColorToAnnotations = (annotations,legends) => {
+    for(var i=0;i<annotations.length;i++){
+      annotations[i].typeColor = this.getColorType(annotations[i].type,legends);
+    }
+    return annotations;
+  }
 
   loadAllPDFAnnotations = () => {
     //var formData = new FormData();
     //formData.append('pdf_id',this.state.pdf_id)
+    console.log('loadAllPDFAnnotations = this.state.pdf_id:',this.state.pdf_id)
 
     const xhr = new XMLHttpRequest();
-    xhr.open('get', '/api/getAllPDFAnnotations?id='+searchParams.get("id"));
+    xhr.open('get', '/api/getAllPDFAnnotations?id='+this.state.pdf_id);//searchParams.get("id"));
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     // set the authorization HTTP header
     xhr.setRequestHeader('Authorization', `bearer ${Auth.getToken()}`);
@@ -88,9 +116,12 @@ class PdfPage extends Component<Props, State> {
     xhr.addEventListener('load', () => {
       if (xhr.status === 200) {
         console.log('getAllAnnotations from server: ',xhr.response);
+        var legends = xhr.response.legends;
+        var annotations = this.getColorToAnnotations(xhr.response.annotations,legends);
 
         this.setState({
-          highlights: _.sortBy(xhr.response,'sortPosition'),
+          highlights: _.sortBy(annotations,'sortPosition'),
+          legends: legends,
         });
       }
     });
@@ -105,7 +136,46 @@ class PdfPage extends Component<Props, State> {
     //console.log(document.getElementById(selectedOption).value);
   }
 
+  editHighlights = (action,id) => {
+      console.log('edit annotation',this.state.legends)
+      const { highlights } = this.state;
+      if(action=='edit'){
+        // set to edit mode
+        //console.log('total hightlights',highlights.length);
+        var highlight = this.getHighlightById(id);
+        highlight.editMode = true;
+        // Update
+        this.setState({
+          highlights: highlights
+        });
+      }else{
+        var highlight = this.getHighlightById(id);
+        highlight.editMode = false;
+
+        var typeSelect = document.getElementById(highlight.id+"_edit_type");
+        var type = typeSelect.options[typeSelect.selectedIndex].value;
+        var comment =  document.getElementById(id+"_edit_comment").value;
+        console.log('comment',comment);
+        //send Update to server
+        const xhr = new XMLHttpRequest();
+        xhr.open('get', '/api/updatePDFAnnotation?id='+this.state.pdf_id+'&idA='+id+'&comment='+comment+'&type='+type);
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        // set the authorization HTTP header
+        xhr.setRequestHeader('Authorization', `bearer ${Auth.getToken()}`);
+        xhr.responseType = 'json';
+        xhr.addEventListener('load', () => {
+          if (xhr.status === 200) {
+            this.loadAllPDFAnnotations();
+            console.log('Saved the Annotations to server: ',xhr.response);
+
+          }
+        });
+        xhr.send();
+      }
+  }
+
   deleteHighlights = (id) => {
+    if (!window.confirm("Do you really want to delete?")) return;
     var previousLen = this.state.highlights.length;
     var filterAr = this.state.highlights.filter(highlight => highlight.id !== id);
     console.log("deleteHighlights: ",previousLen, filterAr.length);
@@ -121,7 +191,7 @@ class PdfPage extends Component<Props, State> {
 
     // Delete annotation to server
     const xhr = new XMLHttpRequest();
-    xhr.open('get', '/api/deletePDFAnnotation?pdfID='+searchParams.get("id")+'&annotationID='+id);
+    xhr.open('get', '/api/deletePDFAnnotation?pdfID='+this.state.pdf_id+'&annotationID='+id);
 
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     // set the authorization HTTP header
@@ -163,7 +233,7 @@ class PdfPage extends Component<Props, State> {
 
   addHighlight(highlight: T_NewHighlight) {
     const { highlights } = this.state;
-
+    console.log('Is type is full:',highlight.type)
     console.log("Saving highlight", highlight);
 
     //var newJson = {:highlights};
@@ -177,7 +247,7 @@ class PdfPage extends Component<Props, State> {
     var annotationObj = JSON.stringify(newHighlight);
     console.log(annotationObj)
     const xhr = new XMLHttpRequest();
-    xhr.open('get', '/api/savePDFAnnotation?id='+searchParams.get("id")+'&info='+annotationObj);
+    xhr.open('get', '/api/savePDFAnnotation?id='+this.state.pdf_id+'&info='+annotationObj);
 
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     // set the authorization HTTP header
@@ -210,14 +280,24 @@ class PdfPage extends Component<Props, State> {
   }
 
   render() {
+    const { match, location, history } = this.props;
     const { highlights } = this.state;
+    const {legends} = this.state;
+
+    const params = new URLSearchParams(location.search)
+    const url = params.get('url');
+    const id = params.get('id');
+
+    this.state.pdf_id = id;
 
     return (
       <div className="App" style={{ display: "flex", height: "100vh" }}>
         <Sidebar
           highlights={highlights}
+          legends ={legends}
           resetHighlights={this.resetHighlights}
           deleteHighlights={this.deleteHighlights}
+          editHighlights={this.editHighlights}
           handleChange={this.handleChange}
           state = {this.state}
         />
@@ -239,7 +319,6 @@ class PdfPage extends Component<Props, State> {
                 onScrollChange={resetHash}
                 scrollRef={scrollTo => {
                   this.scrollViewerTo = scrollTo;
-
                   this.scrollToHighlightFromHash();
                 }}
                 url={url}
@@ -250,10 +329,10 @@ class PdfPage extends Component<Props, State> {
                   transformSelection
                 ) => (
                   <Tip
+                    legends={legends}
                     onOpen={transformSelection}
-                    onConfirm={comment => {
-                      this.addHighlight({ content, position, comment });
-
+                    onConfirm={(comment,type) => {
+                      this.addHighlight({ content, position, comment,type });
                       hideTipAndSelection();
                     }}
                   />

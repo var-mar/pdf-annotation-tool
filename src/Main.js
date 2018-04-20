@@ -101,7 +101,6 @@ class Main extends Component {
               {this.state.authenticated ? (
                 <div className="top-bar-right">
                   <Link to="/dashboard">{MyLocalize.translate('Dashboard')}</Link>
-                  <Link to="/legends">{MyLocalize.translate('Annotation legends')}</Link>
                   <Link to="/about">{MyLocalize.translate('About')}</Link>
                   <Link to="/logout">{MyLocalize.translate('Log out')}</Link>
                 </div>

@@ -8,7 +8,8 @@ import type { T_LTWH } from "../types.js";
 type Props = {
   position: {
     boundingRect: T_LTWH,
-    rects: Array<T_LTWH>
+    rects: Array<T_LTWH>,
+    color:string
   },
   onClick?: () => void,
   onMouseOver?: () => void,
@@ -51,6 +52,7 @@ class Highlight extends Component<Props> {
               'background-color': typeColor,
               'width': 10,
               'height': 10,
+              'margin-top': 5,
               'border-radius': '50%'
             }}></div>
           </div>

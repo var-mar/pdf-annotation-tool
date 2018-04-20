@@ -2,25 +2,34 @@
 
 import React, { Component } from "react";
 
-//import "../style/Tip.css";
+import "../style/Tip.css";
+
+//import {ReactSelectize, SimpleSelect, MultiSelect} from 'react-selectize';
+//import 'react-selectize/themes/index.css'
+
+//import Select from 'react-select';
+//import 'react-select/dist/react-select.css';
 
 type State = {
   compact: boolean,
   text: string,
-  emoji: string
+  emoji: string,
+  type:string
 };
 
 type Props = {
   onConfirm: (comment: { text: string, emoji: string }) => void,
   onOpen: () => void,
-  onUpdate?: () => void
+  onUpdate?: () => void,
+  legends:Array<Object>
 };
 
 class Tip extends Component<Props, State> {
   state = {
     compact: true,
     text: "",
-    emoji: ""
+    emoji: "",
+    type:""
   };
 
   state: State;
@@ -36,8 +45,8 @@ class Tip extends Component<Props, State> {
   }
 
   render() {
-    const { onConfirm, onOpen } = this.props;
-    const { compact, text, emoji } = this.state;
+    const { onConfirm, onOpen,legends } = this.props;
+    const { compact, text, emoji,type } = this.state;
 
     return (
       <div className="Tip">
@@ -56,7 +65,7 @@ class Tip extends Component<Props, State> {
             className="Tip__card"
             onSubmit={event => {
               event.preventDefault();
-              onConfirm({ text, emoji });
+              onConfirm({ text, emoji },type);
             }}
           >
             <div>
@@ -73,20 +82,30 @@ class Tip extends Component<Props, State> {
                 }}
               />
               <div>
-                {["🔴", "🔵", "😍", "🔥", "😳", "⚠️"].map(_emoji => (
-                  <label key={_emoji}>
-                    <input
-                      checked={emoji === _emoji}
-                      type="radio"
-                      name="emoji"
-                      value={_emoji}
-                      onChange={event =>
-                        this.setState({ emoji: event.target.value })
-                      }
-                    />
-                    {_emoji}
-                  </label>
-                ))}
+              <label>Type annotation:</label>
+              <select style={{'width':'100%'}}
+
+                onChange={event =>
+                  this.setState({ type: event.target.value })
+                }
+              >
+                  <option value="" disabled selected hidden>Please type annotation ...</option>
+                {legends.map((legendItem, index) => (
+                  <option key={legendItem._id} value={legendItem._id}>
+                    <div style={{
+                    'background-color': legendItem.color,
+                    'width': 10,
+                    'height': 10,
+                    'margin-top': 5,
+                    'border-radius': '50%',
+                    'float':'left',
+                    'margin-right':10
+                    }}/>
+                    {legendItem.name}
+                  </option>
+                ))};
+              </select>
+
               </div>
             </div>
             <div>

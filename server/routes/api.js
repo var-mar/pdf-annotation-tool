@@ -5,6 +5,7 @@ const pdfUtils  = require('../utils/pdfUtils');
 const multer  = require('multer');
 const upload = multer({ dest: './pdfUpload' });
 const pdf = require('../models/pdf');
+const mongoose = require('mongoose');
 
 router.get('/dashboard', (req, res) => {
   console.log('dashboard is serve');
@@ -40,19 +41,9 @@ router.get('/downloadAnnotatedFile', (req, res) => {
 });
 
 router.get('/getAllPDF', (req, res) => {
-  pdf.find({},(err,docs)=>{
-    res.status(200).json(pdfUtils.filterAuthorId(docs,req.user._id))
+  pdf.getAllPDF(req.user._id, function(cb){
+    res.status(200).json(cb.data);
   });
-});
-
-router.get('/getLegend', (req, res) => {
-  res.status(200).json( [{
- 	"name": "type1",
- 	"color": "#FF00FF"
- }, {
- 	"name": "type2",
- 	"color": "#FF0000"
- }]);
 });
 
 // this delete one annotation in the PDF
@@ -62,6 +53,9 @@ router.get('/deletePDFAnnotation', (req, res) => {
     if(cb.retStatus=='success'){
       console.log('delete Annotations - success',cb.data)
       res.status(200).json();
+
+      // Generate new SVG from new annotation
+      pdfUtils.generateSVG(req.query.pdfID,120,200);
     }else{
       console.log('delete Annotations - error')
       res.status(400).json();
@@ -96,16 +90,42 @@ router.get('/savePDFAnnotation', (req, res) => {
       res.status(400).json();
     }
   });
+});
 
+router.get('/updatePDFAnnotation', (req, res) => {
+  console.log("called /updatePDFAnnotation id:",req.query.id," text:"+req.query.comment);
+
+  pdf.updateAnnotation(req.query.id,req.user._id,req.query.idA,req.query.comment,req.query.type,function(cb){
+    if(cb.retStatus=='success'){
+      console.log('getPDF - success');
+      res.status(200).json({});
+    }else{
+      console.log('getPDF - error');
+      res.status(200).json({});
+    }
+  });
+
+});
+
+router.get('/getPDF', (req, res) => {
+  console.log("called /getAllPDFAnnotations id:",req.query.id)
+  pdf.getPDF(req.query.id,function(cb){
+    if(cb.retStatus=='success'){
+      console.log('getPDF - success');
+      res.status(200).json(cb.data);
+    }else{
+      console.log('getPDF - error');
+      res.status(200).json({});
+    }
+  });
 });
 
 router.get('/getAllPDFAnnotations', (req, res) => {
   console.log("called /getAllPDFAnnotations id:",req.query.id)
-  pdf.getAnnotations(req.query.id,function(cb){
+  pdf.getAnnotations(req.query.id,req.user._id,function(cb){
     if(cb.retStatus=='success'){
       console.log('getAnnotations - success');
-      var json = pdfUtils.filterAuthorId(cb.data,req.user._id);
-      res.status(200).json(json);
+      res.status(200).json(cb.data);
     }else{
       console.log('getAnnotations - error');
       res.status(200).json({});
@@ -138,6 +158,7 @@ router.post('/uploadPDF', upload.single('pdf'), (req, res) => {
     newPdf.pdfInfo = pdfInfo;
     newPdf.author = req.user.name;
     newPdf.authorID = req.user._id;
+
     console.log(newPdf);
     newPdf.save(function (err,data) {
       if (err){console.log('error');

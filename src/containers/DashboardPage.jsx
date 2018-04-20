@@ -4,12 +4,20 @@ import PdfUploadForm from '../components/PdfUploadForm.jsx';
 import { getws } from './../WebSocket'
 import MyLocalize from '../modules/Localize';
 import fileDownload from 'js-file-download';
+import PropTypes from 'prop-types';
 
 class DashboardPage extends React.Component {
 
   /**
    * Class constructor.
    */
+
+  static propTypes = {
+    match: PropTypes.object.isRequired,
+    location: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -17,9 +25,11 @@ class DashboardPage extends React.Component {
     };
   }
 
+  /*
   openPdf = (id,pdf) => {
     window.location = "/pdf?url="+pdf+"&id="+id;
   };
+  */
 
   /**
    * This method will be executed after initial rendering.
@@ -117,6 +127,8 @@ class DashboardPage extends React.Component {
    */
 
   render() {
+    const { match, location, history } = this.props;
+
     return (
     <div className="App" style={{ display: "flex", height: "100vh" }}>
         <div className="sidebar" style={{ width: "25vw",padding:'15px' }}>
@@ -141,19 +153,23 @@ class DashboardPage extends React.Component {
               key={index}
               className="sidebar__highlight"
               onClick={() => {
-                this.openPdf(pdf._id,pdf.filename);
+                //this.openPdf(pdf._id,pdf.filename);
+                history.push("/pdf?url="+pdf.filename+"&id="+pdf._id);
               }}
             >
               <div style={{'overflow': 'hidden'}}>
-
-                <div style={{'float':'left','height':202,'display':'inline-block'}}><img src={pdf._id+".svg"} width="120" height="200" class="svg"/></div>
+                <div style={{'float':'left','height':202,'margin-right':'10px','display':'inline-block'}}>
+                  <img src={pdf._id+".svg"} width="120" height="200" class="svg"/>
+                </div>
                 <strong>{pdf.originalname}</strong><br/>
                 {MyLocalize.translate('Description')}: {pdf.description}<br/>
                 {MyLocalize.translate('Pages')+": "+ pdf.pdfInfo.pdfInfo.numPages} <br/>
                 {MyLocalize.translate('Total annotations') +": "+ pdf.annotations.length}<br/>
-                <a href="#" onClick={(e)=>{this.downloadPDF(e,pdf.path,pdf.originalname)}}>{MyLocalize.translate('Download original')}</a><br/>
+
+                <a href="#" onClick={(e)=>{this.downloadPDF(e,pdf.path,pdf.originalname)}}>{MyLocalize.translate('Download original')}</a> |
                 <a href="#" onClick={(e)=>{this.downloadPDFAnnotated(e,pdf._id,pdf.path,pdf.originalname.split('.')[0]+'_annotated.pdf')}}>{MyLocalize.translate('Download annotated PDF')}</a><br/>
-                {pdf.areYouTheAuthor?(<a href="#" onClick={(e)=>{this.deletePDF(e,pdf._id,pdf.path)}}>{MyLocalize.translate('Delete')}</a>):null}
+                {pdf.areYouTheAuthor?(  <a href="#" onClick={(e)=>{this.deletePDF(e,pdf._id,pdf.path)}}>{MyLocalize.translate('Delete')}</a>):<p>Author: {pdf.authorName}</p>}
+
               </div>
             </li>
           ))}

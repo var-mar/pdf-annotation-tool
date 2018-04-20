@@ -21,6 +21,30 @@ exports.generatePDFAnnotated = function(id,callback){
 }
 
 exports.generateSVG = function(id,vizSizeWidth,vizSizeHeight){
+  var self = this;
+
+  this.getColorType = (id,legends) => {
+    //console.log(id,'==',legends[0]._id)
+    //console.log(id,'==',legends[1]._id)
+    try{
+      //console.log((legends.find(legendItem => String(legendItem._id) === id)).color);
+      return (legends.find(legendItem => String(legendItem._id) === id)).color;
+    }catch(err){
+      //console.log('didnt found')
+      return '';
+    }
+  }
+
+  this.getColorToAnnotations = (annotations,legends) => {
+    console.log('annotations.length:',annotations.length);
+    console.log('legends.length:',legends.length);
+
+    for(var i=0;i<annotations.length;i++){
+      annotations[i].typeColor = this.getColorType(annotations[i].type,legends);
+      //console.log(annotations[i].typeColor);
+    }
+    return annotations;
+  }
 
   pdf.getPDF(id,function(cb){
     var output = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="'+vizSizeWidth+'" height="'+vizSizeHeight+'">\r\n'
@@ -29,6 +53,10 @@ exports.generateSVG = function(id,vizSizeWidth,vizSizeHeight){
       var FRHeight = vizSizeHeight/cb.data.pdfInfo.documentSize.height;
 
       var annotations = cb.data.annotations;
+      var legends = cb.data.legends;
+
+      annotations = self.getColorToAnnotations(annotations,legends);
+
       for(var i=0; i<annotations.length; i++){
         var position = annotations[i].position;
         for(var j=0; j<position.rects.length;j++){
@@ -44,7 +72,8 @@ exports.generateSVG = function(id,vizSizeWidth,vizSizeHeight){
           var height = (position.rects[j].y2-position.rects[j].y1) *FZHeight*FRHeight;
           output +=' width="'+(width)+'"';
           output +=' height="'+(height)+'"';
-          output +=' style="fill:red;stroke: black;stroke-width:5;opacity:0.5"';
+          console.log(annotations[i].typeColor);
+          output +=' style="fill:'+annotations[i].typeColor+';opacity:1"';//stroke:'+annotations[i].typeColor+';stroke-width:5;
           output +=' />\r\n';
         }
       }
@@ -79,17 +108,4 @@ exports.getDocumentSize = function(info){
     }
   }
   return {width:widthMax,height:totalHeight};
-}
-
-exports.filterAuthorId = function(json,authorId){
-  for(var i=0;i<json.length;i++){
-      json[i] = json[i].toObject();
-      if(json[i]['authorID'] == authorId){
-        json[i]['areYouTheAuthor'] = true;
-      }else{
-        json[i]['areYouTheAuthor'] = false;
-      }
-      delete json[i]['authorID'];
-  }
-  return json;
 }
