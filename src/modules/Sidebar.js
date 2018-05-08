@@ -59,7 +59,7 @@ function Sidebar({ highlights, legends,resetHighlights, deleteHighlights, editHi
               'border-radius': '50%',
               'float':'left',
               'margin-right':10
-            }}/>{legendItem.name}
+            }}/>{legendItem.name} {legendItem.count>0?('('+legendItem.count+')'):null}
           </li>
         ))}
         </ul>
@@ -70,9 +70,7 @@ function Sidebar({ highlights, legends,resetHighlights, deleteHighlights, editHi
       </div>
       <div className="description" style={{ padding: "1rem" }}>
         <p>
-          <small>
-            MyLocalize.translate('To create area highlight hold ⌥ Option key (Alt), then click and drag.')
-          </small>
+
         </p>
       </div>
 
@@ -137,7 +135,7 @@ function Sidebar({ highlights, legends,resetHighlights, deleteHighlights, editHi
               ) : null}
             </div>
             <div className="highlight__location">
-              {highlight.areYouTheAuthor==false? (<span>Author: {highlight.authorName}</span>):(<span>Author: you</span>)} |
+              {highlight.areYouTheAuthor==false? (<span>Author: {highlight.author}</span>):(<span>Author: you</span>)} |
               Page {highlight.position.pageNumber} |
               {highlight.areYouTheAuthor? ( <span><span onClick={() => {deleteHighlights(highlight.id);}}>Delete</span> | </span>):null}
               {highlight.areYouTheAuthor && highlight.editMode?
@@ -155,6 +153,11 @@ function Sidebar({ highlights, legends,resetHighlights, deleteHighlights, editHi
   );
 }
 /*
+
+<small>
+  {MyLocalize.translate('To create area annotation hold ⌥ Option key (Alt), then click and drag.')}
+</small>
+
 
 <input type="checkbox" className="checkbox-control" name="disabled" onChange={handleChange}/>
 See only my annotations

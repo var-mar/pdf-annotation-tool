@@ -170,7 +170,7 @@ PDFSchema.statics = {
     annotationModel.type = info.type;
 
     // position first annotation in the page
-    annotationModel.sortPosition = parseFloat(info.position.pageNumber)+(parseFloat(info.position.rects[0].y1/info.position.rects[0].height));
+    annotationModel.sortPosition = parseFloat(info.position.pageNumber)+(parseFloat(info.position.boundingRect.y1/info.position.boundingRect.height));
 
     // Added fields
     annotationModel.authorID = authorID;
@@ -283,7 +283,7 @@ PDFSchema.statics = {
   },
 
   // Get all annotations -------------------------------------------------------------------------
-  getPDF : function(pdfID, cb) {
+  getPDF : function(pdfID,userId, cb) {
     var PdfModel = mongoose.model('pdf',PDFSchema);
     // Find PDF to add new annotations
     PdfModel.findOne({_id: pdfID}, function(err, pdf) {
@@ -296,7 +296,7 @@ PDFSchema.statics = {
             if (pdf) {
                     cb({
                         retStatus: "success",
-                        data: pdf
+                        data: filterAuthorId(pdf,userId)
                     });
             } else {
                 cb({

@@ -27,7 +27,7 @@ var myLocalize = new Localize({
         "ee": "Registreeruge",
         "es": "Registrarse"
     },
-    "To create area highlight hold ⌥ Option key (Alt), then click and drag.": {
+    "To create area annotation hold ⌥ Option key (Alt), then click and drag.": {
         "ee": "Piirkonna esiletõstmise hoidmiseks hoidke ⌥ valikuvõtit (Alt), seejärel klõpsake ja lohistage.",
         "es": "Para crear área resaltada, mantenga presionada la tecla  ⌥ Opción (Alt), luego haga clic y arrastre."
     },

@@ -52,10 +52,13 @@ router.get('/deletePDFAnnotation', (req, res) => {
   pdf.removeAnnotation(req.query.pdfID, req.query.annotationID, req.user._id, function(cb){
     if(cb.retStatus=='success'){
       console.log('delete Annotations - success',cb.data)
-      res.status(200).json();
 
       // Generate new SVG from new annotation
-      pdfUtils.generateSVG(req.query.pdfID,120,200);
+      pdfUtils.generateSVG(req.query.pdfID,req.user._id,120,200);
+      console.log('save SVG');
+
+      // send response
+      res.status(200).json();
     }else{
       console.log('delete Annotations - error')
       res.status(400).json();
@@ -68,6 +71,7 @@ router.get('/deletePDF', (req, res) => {
   console.log('Called /deletePDF');
   // delete in database
   pdf.findByIdAndRemove(req.query.id, function (err, user) {
+
   });
   //detele file
   fs.unlink(req.query.path, function (err) {
@@ -82,9 +86,13 @@ router.get('/savePDFAnnotation', (req, res) => {
   pdf.saveAnnotation(req.query.id, info, req.user._id, req.user.name, function(cb){
     if(cb.retStatus=='success'){
       console.log('save Annotations - success',cb.data)
-      res.status(200).json();
+
       // Generate new SVG from new annotation
-      pdfUtils.generateSVG(req.query.id,120,200);
+      pdfUtils.generateSVG(req.query.id,req.user._id,120,200);
+      console.log('save SVG');
+
+      // Send response to request
+      res.status(200).json();
     }else{
       console.log('save Annotations - error');
       res.status(400).json();
@@ -107,9 +115,9 @@ router.get('/updatePDFAnnotation', (req, res) => {
 
 });
 
-router.get('/getPDF', (req, res) => {
-  console.log("called /getAllPDFAnnotations id:",req.query.id)
-  pdf.getPDF(req.query.id,function(cb){
+router.get('/getPDFInfo', (req, res) => {
+  console.log("called /getPDF id:",req.query.id)
+  pdf.getPDF(req.query.id,req.user._id,function(cb){
     if(cb.retStatus=='success'){
       console.log('getPDF - success');
       res.status(200).json(cb.data);

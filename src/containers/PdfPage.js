@@ -102,6 +102,16 @@ class PdfPage extends Component<Props, State> {
     return annotations;
   }
 
+  getCountTypeAnnotations = (annotations,legends)=>{
+    for(var j=0;j<legends.length;j++){
+      legends[j].count = 0;
+      for(var i=0;i<annotations.length;i++){
+        if(annotations[i].type == legends[j]._id) legends[j].count += 1;
+      }
+    }
+    return legends;
+  }
+
   loadAllPDFAnnotations = () => {
     //var formData = new FormData();
     //formData.append('pdf_id',this.state.pdf_id)
@@ -116,8 +126,12 @@ class PdfPage extends Component<Props, State> {
     xhr.addEventListener('load', () => {
       if (xhr.status === 200) {
         console.log('getAllAnnotations from server: ',xhr.response);
+        var annotations = xhr.response.annotations;
         var legends = xhr.response.legends;
-        var annotations = this.getColorToAnnotations(xhr.response.annotations,legends);
+        // Add count types to legends
+        legends = this.getCountTypeAnnotations(annotations,legends);
+        // Add colour type to all anotations
+        annotations = this.getColorToAnnotations(annotations,legends);
 
         this.setState({
           highlights: _.sortBy(annotations,'sortPosition'),
@@ -152,8 +166,10 @@ class PdfPage extends Component<Props, State> {
         var highlight = this.getHighlightById(id);
         highlight.editMode = false;
 
-        var typeSelect = document.getElementById(highlight.id+"_edit_type");
+        var typeSelect = document.getElementById(id+"_edit_type");
+        console.log(typeSelect);
         var type = typeSelect.options[typeSelect.selectedIndex].value;
+        console.log(type);
         var comment =  document.getElementById(id+"_edit_comment").value;
         console.log('comment',comment);
         //send Update to server

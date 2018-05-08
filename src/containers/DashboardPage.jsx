@@ -34,6 +34,10 @@ class DashboardPage extends React.Component {
   /**
    * This method will be executed after initial rendering.
    */
+   goPDFInfo = (event,pdf_id,history) =>{
+     event.stopPropagation();
+     history.push("/pdfInfo?id="+pdf_id);
+   }
 
    downloadPDF = (event,path,downloadName)=>{
      event.stopPropagation();
@@ -165,10 +169,10 @@ class DashboardPage extends React.Component {
                 {MyLocalize.translate('Description')}: {pdf.description}<br/>
                 {MyLocalize.translate('Pages')+": "+ pdf.pdfInfo.pdfInfo.numPages} <br/>
                 {MyLocalize.translate('Total annotations') +": "+ pdf.annotations.length}<br/>
-
+                <a href="#" onClick={(e)=>{this.goPDFInfo(e,pdf._id,history)}}>{MyLocalize.translate('Document info')}</a><br/>
                 <a href="#" onClick={(e)=>{this.downloadPDF(e,pdf.path,pdf.originalname)}}>{MyLocalize.translate('Download original')}</a> |
                 <a href="#" onClick={(e)=>{this.downloadPDFAnnotated(e,pdf._id,pdf.path,pdf.originalname.split('.')[0]+'_annotated.pdf')}}>{MyLocalize.translate('Download annotated PDF')}</a><br/>
-                {pdf.areYouTheAuthor?(  <a href="#" onClick={(e)=>{this.deletePDF(e,pdf._id,pdf.path)}}>{MyLocalize.translate('Delete')}</a>):<p>Author: {pdf.authorName}</p>}
+                {pdf.areYouTheAuthor?( <a href="#" onClick={(e)=>{this.deletePDF(e,pdf._id,pdf.path)}}>{MyLocalize.translate('Delete')}</a>):<span>Author: {pdf.author}</span>}<br/>
 
               </div>
             </li>

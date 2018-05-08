@@ -58,7 +58,7 @@ class Tip extends Component<Props, State> {
               this.setState({ compact: false });
             }}
           >
-            Add highlight
+            Add annotation
           </div>
         ) : (
           <form

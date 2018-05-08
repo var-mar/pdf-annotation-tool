@@ -20,7 +20,7 @@ exports.generatePDFAnnotated = function(id,callback){
   callback();
 }
 
-exports.generateSVG = function(id,vizSizeWidth,vizSizeHeight){
+exports.generateSVG = function(id,userId,vizSizeWidth,vizSizeHeight){
   var self = this;
 
   this.getColorType = (id,legends) => {
@@ -36,17 +36,13 @@ exports.generateSVG = function(id,vizSizeWidth,vizSizeHeight){
   }
 
   this.getColorToAnnotations = (annotations,legends) => {
-    console.log('annotations.length:',annotations.length);
-    console.log('legends.length:',legends.length);
-
     for(var i=0;i<annotations.length;i++){
       annotations[i].typeColor = this.getColorType(annotations[i].type,legends);
-      //console.log(annotations[i].typeColor);
     }
     return annotations;
   }
 
-  pdf.getPDF(id,function(cb){
+  pdf.getPDF(id,userId,function(cb){
     var output = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="'+vizSizeWidth+'" height="'+vizSizeHeight+'">\r\n'
     if(cb.retStatus=='success'){
       var FRWidth  = vizSizeWidth/cb.data.pdfInfo.documentSize.width;
@@ -72,8 +68,7 @@ exports.generateSVG = function(id,vizSizeWidth,vizSizeHeight){
           var height = (position.rects[j].y2-position.rects[j].y1) *FZHeight*FRHeight;
           output +=' width="'+(width)+'"';
           output +=' height="'+(height)+'"';
-          console.log(annotations[i].typeColor);
-          output +=' style="fill:'+annotations[i].typeColor+';opacity:1"';//stroke:'+annotations[i].typeColor+';stroke-width:5;
+          output +=' style="fill:'+annotations[i].typeColor+';stroke:'+annotations[i].typeColor+';stroke-width:5;opacity:1"';//
           output +=' />\r\n';
         }
       }

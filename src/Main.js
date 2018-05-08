@@ -21,6 +21,7 @@ import LogoutFunction from './containers/LogoutFunction.jsx';
 import SignUpPage from './containers/SignUpPage.jsx';
 import DashboardPage from './containers/DashboardPage.jsx';
 import LegendsPage from './containers/LegendsPage.jsx';
+import PdfInfoPage from './containers/PdfInfoPage.jsx';
 import HomePage from './containers/HomePage.jsx';
 import Auth from './modules/Auth';
 import PdfPage from './containers/PdfPage';
@@ -34,7 +35,7 @@ let ws = initws();
 // remove tap delay, essential for MaterialUI to work properly
 injectTapEventPlugin();
 
-console.log('version:1.4');
+console.log('version:1.5');
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={props => (
@@ -118,6 +119,7 @@ class Main extends Component {
             <PrivateRoute path="/dashboard" component={DashboardPage}/>
             <PrivateRoute path="/legends" component={LegendsPage}/>
             <PrivateRoute path="/pdf" component={PdfPage}/>
+            <PrivateRoute path="/pdfInfo" component={PdfInfoPage}/>
             <LoggedOutRoute path="/login" component={LoginPage} toggleAuthenticateStatus={() => this.toggleAuthenticateStatus()} />
             <LoggedOutRoute path="/signup" component={SignUpPage}/>
             <PropsRoute path="/about" component={AboutPage}/>
