@@ -12,10 +12,16 @@ The tool wants to be a tool to create metadata annotations to PDF for open data 
 - Visualize pdf using PDF.js and create annotations using library react-pdf-annotator.
  metadata PDF in information page
 - Visualize metadata PDF in information page
-- Create Visualization thumbnail annotations made. Colors rectangles are 
+- Create Visualization thumbnail annotations made. Colors rectangles are
+
+## Screenshot Tool
+![Homepage](screenshots/screenshot1.png)
+![Dashboard](screenshots/screenshot2.png)
+![Pdf annotation page](screenshots/screenshot3.png)
 
 ## Todo list
 
+Tool now is in prototype state. To be a ready tool need more work:
 - [Clean code]
 - [Test and debug application]
 - [Create Legend(now is add manually to the database)]
@@ -23,6 +29,8 @@ The tool wants to be a tool to create metadata annotations to PDF for open data 
 - [Create comments to existing comments] (suggest in the workshop)
 - [Create multi selection to annotation types] (suggest in the github issue)
 - [Fix image annotations of the pdf]
+- [Fix edit annotations already created]
+- [Add in pdf information all annotation activity data (log of:created annotations, modified, delete). Restore delete messages or modified to certain previous state]
 
 ## Prior art and Installation Dependencies
 
@@ -31,7 +39,7 @@ The project was created using create-react-app (https://github.com/facebook/crea
 Install all dependencies before running scripts with following:
 
 ```sh
-npm install 
+npm install
 ```
 
 ## Important available Scripts
