@@ -17,8 +17,10 @@ The tool wants to be a tool to create metadata annotations to PDF for open data 
 ## Screenshot Tool
 ### Homepage
 <img src="https://github.com/var-mar/pdf-annotation-tool/raw/master/screenshots/Screenshot1.png" height="200">
+
 ### Dashboard
 <img src="https://github.com/var-mar/pdf-annotation-tool/raw/master/screenshots/Screenshot2.png" height="200">
+
 ### Pdf annotation page
 <img src="https://github.com/var-mar/pdf-annotation-tool/raw/master/screenshots/Screenshot3.png" height="200">
 
