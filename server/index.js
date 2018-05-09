@@ -67,7 +67,7 @@ app.set('port', (process.env.PORT || 8080));
 
 // Start the server
 app.listen(app.get('port'), () => {
-  console.log(`Server is running on port ${app.get('port')}`);
+  console.log('start server 8080');
 });
 
 // Setup websockets

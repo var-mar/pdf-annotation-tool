@@ -8,6 +8,9 @@
 
 # production
 /build
+/build
+/pdfUpload
+/svgThumbnails
 
 # misc
 .DS_Store
