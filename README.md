@@ -15,9 +15,9 @@ The tool wants to be a tool to create metadata annotations to PDF for open data 
 - Create Visualization thumbnail annotations made. Colors rectangles are
 
 ## Screenshot Tool
-![Homepage](https://github.com/var-mar/pdf-annotation-tool/raw/master/screenshots/Screenshot1.png =300x200)
-![Dashboard](https://github.com/var-mar/pdf-annotation-tool/raw/master/screenshots/Screenshot2.png =300x200)
-![Pdf annotation page](https://github.com/var-mar/pdf-annotation-tool/raw/master/screenshots/Screenshot3.png =300x200)
+![Homepage]<img src="https://github.com/var-mar/pdf-annotation-tool/raw/master/screenshots/Screenshot1.png" width="300">
+![Dashboard]<img src="https://github.com/var-mar/pdf-annotation-tool/raw/master/screenshots/Screenshot2.png" width="300">
+![Pdf annotation page]<img src="https://github.com/var-mar/pdf-annotation-tool/raw/master/screenshots/Screenshot3.png" width="300">
 
 ## Todo list
 
