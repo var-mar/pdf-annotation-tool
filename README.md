@@ -24,7 +24,7 @@ The tool wants to be a tool to create metadata annotations to PDF for open data 
 - [Create multi selection to annotation types] (suggest in the github issue)
 - [Fix image annotations of the pdf]
 
-## Installation Dependencies
+## Prior art and Installation Dependencies
 
 The project was created using create-react-app (https://github.com/facebook/create-react-app). And it has been using the react-pdf-annotation library as base code: https://github.com/agentcooper/react-pdf-annotator .
 
