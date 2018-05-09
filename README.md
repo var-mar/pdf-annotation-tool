@@ -7,12 +7,13 @@ The tool wants to be a tool to create metadata annotations to PDF for open data 
 
 ## Table of functionalities build in the tool
 
-- Login system base on Passport (https://www.npmjs.com/package/passport)
-- Upload pdf
+- Login system base on Passport.js (https://www.npmjs.com/package/passport)
+- Upload pdf's, delete pdf
+- See list pdf's upload from all users
 - Visualize pdf using PDF.js and create annotations using library react-pdf-annotator.
- metadata PDF in information page
+- Show of each metadata PDF in information page
 - Visualize metadata PDF in information page
-- Create Visualization thumbnail annotations made. Colors rectangles are
+- Create Visualization thumbnail annotations made. Rectangles are coloured with the colour defined in annotation type.
 
 ## Screenshot Tool
 ### Homepage
