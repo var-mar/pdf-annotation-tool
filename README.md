@@ -4,7 +4,7 @@
 ## Description:
 
 The tool wants to be a tool to create metadata annotations to PDF for open data sets.
-It is made using the following libraries: React.js, Node.js, pdf.js, Mongodb, react-pdf-annotator. 
+It is made using the following libraries: React.js, Node.js, pdf.js, Mongodb, react-pdf-annotator.
 
 ## Table of functionalities build in the tool
 
@@ -15,6 +15,8 @@ It is made using the following libraries: React.js, Node.js, pdf.js, Mongodb, re
 - Show of each metadata PDF in information page
 - Visualize metadata PDF in information page
 - Create Visualization thumbnail annotations made. Rectangles are coloured with the colour defined in annotation type.
+- App have login restricted pages and public pages
+- Api with login services and public ones
 
 ## Screenshot Tool
 ### Homepage
