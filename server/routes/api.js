@@ -35,6 +35,38 @@ router.get('/downloadAnnotatedFile', (req, res) => {
     // download
     console.log(req.query);
     console.log('router download:','/'+req.query.path+'_annotated', req.query.downloadname)
+    
+    // https://github.com/agentcooper/pdf-annotation-service
+    /*
+    let annotations = [];
+     try {
+       const urlObject = urlTools.parse(req.url, true);
+       annotations = JSON.parse(urlObject.query.annotations);
+     } catch (e) {
+       res.end('Fail');
+     }
+
+     let body = [];
+
+     req
+       .on('data', chunk => {
+         body.push(chunk);
+       })
+       .on('end', () => {
+         body = Buffer.concat(body);
+         console.log('Got buffer');
+
+         const inStream = new PDFRStreamForBuffer(body);
+         const outStream = new hummus.PDFStreamForResponse(res);
+
+         console.log('Working...');
+         work(annotations, inStream, outStream);
+
+         console.log('Done');
+         res.end();
+       });
+    */
+
     res.setHeader('content-disposition', 'attachment;filename='+req.query.downloadname);
     res.download(req.query.path+'_annotated', req.query.downloadname);
   });
@@ -187,35 +219,6 @@ router.post('/uploadPDF', upload.single('pdf'), (req, res) => {
   //res.status(200).json({});
 });
 
+
+
 module.exports = router;
-
-// https://github.com/agentcooper/pdf-annotation-service
-/*
-let annotations = [];
- try {
-   const urlObject = urlTools.parse(req.url, true);
-   annotations = JSON.parse(urlObject.query.annotations);
- } catch (e) {
-   res.end('Fail');
- }
-
- let body = [];
-
- req
-   .on('data', chunk => {
-     body.push(chunk);
-   })
-   .on('end', () => {
-     body = Buffer.concat(body);
-     console.log('Got buffer');
-
-     const inStream = new PDFRStreamForBuffer(body);
-     const outStream = new hummus.PDFStreamForResponse(res);
-
-     console.log('Working...');
-     work(annotations, inStream, outStream);
-
-     console.log('Done');
-     res.end();
-   });
-*/
