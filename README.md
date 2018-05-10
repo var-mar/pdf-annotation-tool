@@ -14,7 +14,7 @@ It is made using the following libraries: React.js, Node.js, pdf.js, Mongodb, re
 - Visualize pdf using PDF.js and create annotations using library react-pdf-annotator.
 - Show of each metadata PDF in information page
 - Visualize metadata PDF in information page
-- Create Visualization thumbnail annotations made. Rectangles are coloured with the colour defined in annotation type.
+- Create Visualization thumbnail annotations made. Rectangles are coloured with the colour defined in annotation type. (Inspired by texty data viz method created by Jaume Nualart: http://www.informationr.net/ir/18-2/paper581.html#.WvQyp9NubOQ )
 - App have login restricted pages and public pages
 - Api with login services and public ones
 
