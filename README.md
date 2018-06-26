@@ -11,7 +11,7 @@ It is made using the following libraries: React.js, Node.js, pdf.js, Mongodb, re
 - Login system base on Passport.js (https://www.npmjs.com/package/passport)
 - Upload pdf's, delete pdf
 - See list pdf's upload from all users
-- Visualize pdf using PDF.js and create annotations using library react-pdf-annotator.
+- Visualize pdf using PDF.js and create annotations using library react-pdf-highlighter.
 - Show of each metadata PDF in information page
 - Visualize metadata PDF in information page
 - Create Visualization thumbnail annotations made. Rectangles are coloured with the colour defined in annotation type. (Inspired by texty data viz method created by Jaume Nualart: http://www.informationr.net/ir/18-2/paper581.html#.WvQyp9NubOQ )
@@ -43,7 +43,7 @@ Tool now is in prototype state. To be a ready tool need more work:
 
 ## Prior art and Installation Dependencies
 
-The project was created using create-react-app (https://github.com/facebook/create-react-app). And it has been using the react-pdf-annotation library as base code: https://github.com/agentcooper/react-pdf-annotator .
+The project was created using create-react-app (https://github.com/facebook/create-react-app). And it has been using the react-pdf-highlighter library as base code: https://github.com/agentcooper/react-pdf-highlighter .
 
 Install all dependencies before running scripts with following:
 
