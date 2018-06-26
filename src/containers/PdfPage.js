@@ -12,7 +12,7 @@ import {
   /*Highlight,*/
   Popup,
   AreaHighlight
-} from "react-pdf-annotator";
+} from "react-pdf-highlighter";
 import Tip from "../modules/Tip";
 import Highlight from "../modules/Highlight";
 
